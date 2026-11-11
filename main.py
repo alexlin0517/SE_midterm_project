@@ -5,6 +5,7 @@
 """
 
 from contextlib import asynccontextmanager
+from typing import Optional
 from fastapi import FastAPI, Depends, Request, Form, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -14,18 +15,19 @@ from sqlalchemy.orm import Session
 import db
 import models
 import crud
-from models import ManuscriptStatus
+from models import ManuscriptStatus, MANUSCRIPT_CATEGORIES, DEFAULT_CATEGORY
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     生命週期管理 (Lifespan Context Manager)
-    在應用程式啟動時嘗試自動建立資料表結構。
+    在應用程式啟動時嘗試自動建立資料表結構，並檢查舊版資料庫欄位相容性。
     """
     try:
         models.Base.metadata.create_all(bind=db.engine)
-        print(">>> 資料庫連線正常，已確認資料表 (manuscripts, users) 建立就緒。")
+        crud.ensure_schema_compatibility(db.engine)
+        print(">>> 資料庫連線正常，已確認資料表 (manuscripts, users) 建立與結構相容就緒。")
     except Exception as exc:
         print(f">>> 【提醒】資料庫初始化失敗，請檢查 db.py 連線設定: {exc}")
     yield
@@ -109,7 +111,9 @@ async def new_manuscript_page(
         name="manuscript_form.html",
         context={
             "author_id": author_id,
-            "manuscript": None
+            "manuscript": None,
+            "categories": MANUSCRIPT_CATEGORIES,
+            "default_category": DEFAULT_CATEGORY,
         }
     )
 
@@ -119,12 +123,13 @@ async def create_manuscript_action(
     author_id: int,
     title: str = Form(...),
     content: str = Form(...),
+    category: Optional[str] = Form(default=None),
     form_author_id: int = Form(..., alias="author_id"),
     session: Session = Depends(db.get_db)
 ):
     """
     處理作者新增稿件請求：
-    [業務規則] 新增稿件 => 狀態初始化為「編輯中」
+    [業務規則] 新增稿件 => 狀態初始化為「編輯中」；若未選取類別或舊版資料庫無此欄位，以「--無類別--」提交
     """
     if author_id != form_author_id:
         raise HTTPException(
@@ -136,7 +141,8 @@ async def create_manuscript_action(
         db=session,
         title=title.strip(),
         content=content.strip(),
-        author_id=author_id
+        author_id=author_id,
+        category=category
     )
 
     # 303 See Other 重新導向回作者儀表板
@@ -181,7 +187,9 @@ async def edit_manuscript_page(
         name="manuscript_form.html",
         context={
             "author_id": author_id,
-            "manuscript": manuscript
+            "manuscript": manuscript,
+            "categories": MANUSCRIPT_CATEGORIES,
+            "default_category": DEFAULT_CATEGORY,
         }
     )
 
@@ -192,12 +200,13 @@ async def update_manuscript_action(
     manuscript_id: int,
     title: str = Form(...),
     content: str = Form(...),
+    category: Optional[str] = Form(default=None),
     form_author_id: int = Form(..., alias="author_id"),
     session: Session = Depends(db.get_db)
 ):
     """
     處理作者更新稿件請求：
-    [業務規則] 編輯稿件 => 狀態保持為「編輯中」
+    [業務規則] 編輯稿件 => 狀態保持為「編輯中」；若未選取類別或舊版資料庫無此欄位，以「--無類別--」提交
     """
     if author_id != form_author_id:
         raise HTTPException(
@@ -228,7 +237,8 @@ async def update_manuscript_action(
         db=session,
         manuscript=manuscript,
         title=title.strip(),
-        content=content.strip()
+        content=content.strip(),
+        category=category
     )
 
     return RedirectResponse(

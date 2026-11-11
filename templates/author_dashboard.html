@@ -25,6 +25,7 @@
             <tr>
                 <th>稿件編號</th>
                 <th>稿件標題</th>
+                <th>稿件類別</th>
                 <th>稿件內容</th>
                 <th>目前狀態</th>
                 <th>建立時間</th>
@@ -37,6 +38,7 @@
             <tr>
                 <td>{{ item.id }}</td>
                 <td><strong>{{ item.title }}</strong></td>
+                <td>{{ item.category or "--無類別--" }}</td>
                 <td>{{ item.content }}</td>
                 <td>
                     <strong>{{ item.status }}</strong>

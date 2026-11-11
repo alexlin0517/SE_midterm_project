@@ -28,6 +28,22 @@
             </p>
 
             <p>
+                <label for="category"><strong>稿件類別：</strong></label>
+                <br>
+                {% set resolved_default = default_category | default('--無類別--', true) %}
+                {% set resolved_categories = categories | default(['散文', '小說', '心得', '紀錄', '評論', '其他'], true) %}
+                <select id="category" name="category">
+                    <option value="{{ resolved_default }}" {% if not manuscript or not manuscript.category or manuscript.category == resolved_default %}selected{% endif %}>{{ resolved_default }}</option>
+                    {% for cat in resolved_categories %}
+                    <option value="{{ cat }}" {% if manuscript and manuscript.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                    {% if manuscript and manuscript.category and manuscript.category != resolved_default and manuscript.category not in resolved_categories %}
+                    <option value="{{ manuscript.category }}" selected>{{ manuscript.category }}</option>
+                    {% endif %}
+                </select>
+            </p>
+
+            <p>
                 <label for="content"><strong>稿件內文：</strong></label>
                 <br>
                 <textarea id="content" name="content" rows="12" cols="70" required placeholder="請輸入稿件詳細內容...">{{ manuscript.content if manuscript else '' }}</textarea>
