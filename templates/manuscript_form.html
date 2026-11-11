@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ "編輯稿件" if manuscript else "新增稿件" }} - 作者 ID: {{ author_id }}</title>
+</head>
+<body>
+    <h1>{{ "編輯稿件內容" if manuscript else "建立新稿件" }}</h1>
+    <p>作者編號：<strong>作者 {{ author_id }} (Author ID: {{ author_id }})</strong></p>
+
+    <nav>
+        <p><a href="/author/{{ author_id }}/dashboard">返回作者儀表板</a></p>
+    </nav>
+
+    <hr>
+
+    <form action="{{ '/author/' ~ author_id ~ '/manuscripts/' ~ manuscript.id ~ '/edit' if manuscript else '/author/' ~ author_id ~ '/manuscripts/new' }}" method="post">
+        <!-- 模擬登入：透過隱藏欄位傳遞與驗證 author_id -->
+        <input type="hidden" name="author_id" value="{{ author_id }}">
+
+        <fieldset>
+            <legend>{{ "修改稿件資料" if manuscript else "撰寫稿件資訊" }}</legend>
+
+            <p>
+                <label for="title"><strong>稿件標題：</strong></label>
+                <br>
+                <input type="text" id="title" name="title" size="60" maxlength="200" value="{{ manuscript.title if manuscript else '' }}" required placeholder="請輸入稿件標題">
+            </p>
+
+            <p>
+                <label for="content"><strong>稿件內文：</strong></label>
+                <br>
+                <textarea id="content" name="content" rows="12" cols="70" required placeholder="請輸入稿件詳細內容...">{{ manuscript.content if manuscript else '' }}</textarea>
+            </p>
+
+            <p>
+                <button type="submit">{{ "儲存變更 (狀態保持為「編輯中」)" if manuscript else "確認新增 (建立為「編輯中」)" }}</button>
+                <a href="/author/{{ author_id }}/dashboard">取消並返回</a>
+            </p>
+        </fieldset>
+    </form>
+
+    <hr>
+
+    <h3>注意事項</h3>
+    <ul>
+        <li>新增或修改後的稿件狀態皆會設為<strong>「編輯中」</strong>。</li>
+        <li>儲存後請至作者儀表板點選<strong>「送出審查」</strong>，稿件才會正式提交給編輯人員審核。</li>
+    </ul>
+</body>
+</html>

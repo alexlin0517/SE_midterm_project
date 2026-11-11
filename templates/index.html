@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>投稿審查系統 - 模擬登入首頁</title>
+</head>
+<body>
+    <h1>投稿審查系統 (Submission and Review System)</h1>
+    <p>歡迎使用投稿審查系統！本系統採用單體式架構 (Monolithic Architecture) 與伺服器端渲染 (SSR)。</p>
+    <p>本專案採用「模擬登入 (Mock Login)」機制切換角色，請選擇您的模擬身分進入系統：</p>
+
+    <hr>
+
+    <h2>請選擇身分進入儀表板</h2>
+    <ul>
+        <li>
+            <strong>作者身分 (Author)：</strong>
+            <ul>
+                <li><a href="/author/1/dashboard">以「作者 1 (Author ID: 1)」身分登入</a></li>
+                <li><a href="/author/2/dashboard">以「作者 2 (Author ID: 2)」身分登入</a></li>
+                <li><a href="/author/3/dashboard">以「作者 3 (Author ID: 3)」身分登入</a></li>
+            </ul>
+        </li>
+        <li>
+            <strong>編輯身分 (Editor)：</strong>
+            <ul>
+                <li><a href="/editor/dashboard">以「編輯 (Editor)」身分進入審查後台</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>系統核心規則與狀態流轉說明</h2>
+    <ol>
+        <li><strong>稿件狀態定義：</strong>編輯中 (Draft)、審查中 (Under Review)、已通過 (Approved)。</li>
+        <li><strong>[作者] 新增/編輯稿件：</strong>稿件初始狀態或修改後狀態均為「編輯中」。</li>
+        <li><strong>[作者] 刪除稿件：</strong>只有狀態為「編輯中」的稿件可以被刪除。</li>
+        <li><strong>[作者] 送出投稿：</strong>狀態將由「編輯中」推進為「審查中」，進入編輯待審清單，作者端鎖定修改與刪除。</li>
+        <li><strong>[編輯] 審核通過：</strong>狀態由「審查中」推進為「已通過」。</li>
+        <li><strong>[編輯] 退回稿件：</strong>狀態由「審查中」退回為「編輯中」，作者可重新修改後再次投稿。</li>
+    </ol>
+</body>
+</html>

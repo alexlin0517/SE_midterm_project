@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>編輯審查儀表板</title>
+</head>
+<body>
+    <h1>編輯審查管理儀表板</h1>
+    <p>當前模擬身分：<strong>主編 / 審查編輯 (Editor)</strong></p>
+
+    <nav>
+        <p><a href="/">返回模擬登入首頁</a></p>
+    </nav>
+
+    <hr>
+
+    <h2>待審查稿件清單 (狀態：審查中)</h2>
+
+    {% if under_review_manuscripts %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>稿件編號</th>
+                <th>投稿作者</th>
+                <th>稿件標題</th>
+                <th>稿件完整內容</th>
+                <th>送審時間</th>
+                <th>審查決策</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in under_review_manuscripts %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>作者 {{ item.author_id }} (Author ID: {{ item.author_id }})</td>
+                <td><strong>{{ item.title }}</strong></td>
+                <td>{{ item.content }}</td>
+                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</td>
+                <td>
+                    <form action="/editor/manuscripts/{{ item.id }}/approve" method="post">
+                        <button type="submit">審核通過 (Approved)</button>
+                    </form>
+
+                    <br>
+
+                    <form action="/editor/manuscripts/{{ item.id }}/reject" method="post">
+                        <button type="submit">退回修改 (Return to Draft)</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>目前沒有任何「審查中」的稿件待處理。</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>全系統稿件審查紀錄一覽</h2>
+
+    {% if all_manuscripts %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>稿件編號</th>
+                <th>作者 ID</th>
+                <th>稿件標題</th>
+                <th>目前狀態</th>
+                <th>建立時間</th>
+                <th>最後更新時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in all_manuscripts %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>作者 {{ item.author_id }}</td>
+                <td>{{ item.title }}</td>
+                <td><strong>{{ item.status }}</strong></td>
+                <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</td>
+                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>資料庫中尚無任何稿件資料。</p>
+    {% endif %}
+
+    <hr>
+
+    <h3>審查規則說明</h3>
+    <ul>
+        <li>編輯僅能對狀態為<strong>「審查中」</strong>的稿件執行審核決策。</li>
+        <li>點擊<strong>「審核通過」</strong>：狀態改為「已通過」，稿件審查流程圓滿結束。</li>
+        <li>點擊<strong>「退回修改」</strong>：狀態退回為「編輯中」，該稿件將回歸作者儀表板供作者修改與重新送出。</li>
+    </ul>
+</body>
+</html>

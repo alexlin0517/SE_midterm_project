@@ -1,0 +1,16 @@
+# Python 虛擬環境 (Virtual Environment)
+venv/
+.venv/
+env/
+
+# Python 快取與編譯檔
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 環境變數與機密資訊
+.env
+
+# 編輯器暫存
+.vscode/
+.idea/
