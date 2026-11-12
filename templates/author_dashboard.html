@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>作者儀表板 - 作者 ID: {{ author_id }}</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
     <div class="ambient-orb" aria-hidden="true"></div>
@@ -13,7 +13,7 @@
         <header class="glass-card topbar">
             <div class="brand-group">
                 <div class="brand-icon-wrap">
-                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                    <span class="icon icon-lg">{% include 'static/icons/logo.svg' %}</span>
                 </div>
                 <div>
                     <h1 class="page-title">作者稿件管理儀表板</h1>
@@ -23,15 +23,15 @@
 
             <nav class="nav-actions" aria-label="作者功能導覽">
                 <span class="role-pill">
-                    <span class="icon icon-sm">{% include 'icons/author.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/author.svg' %}</span>
                     <span>作者 {{ author_id }} (ID: {{ author_id }})</span>
                 </span>
                 <a class="btn btn-secondary" href="/">
-                    <span class="icon icon-sm">{% include 'icons/home.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/home.svg' %}</span>
                     <span>返回模擬登入首頁</span>
                 </a>
                 <a class="btn btn-primary" href="/author/{{ author_id }}/manuscripts/new">
-                    <span class="icon icon-sm">{% include 'icons/plus.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/plus.svg' %}</span>
                     <span>新增稿件</span>
                 </a>
             </nav>
@@ -40,7 +40,7 @@
         <section class="glass-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span class="icon icon-md">{% include 'icons/status-draft.svg' %}</span>
+                    <span class="icon icon-md">{% include 'static/icons/status-draft.svg' %}</span>
                     <span>我的稿件列表</span>
                 </h2>
                 <span class="count-pill">共 {{ manuscripts | length }} 筆</span>
@@ -69,7 +69,6 @@
                             <td>
                                 {% set cat = item.category or "--無類別--" %}
                                 <span class="badge {% if cat == '--無類別--' %}category-empty{% else %}category-badge{% endif %}">
-                                    <span class="icon icon-xs">{% include 'icons/tag.svg' %}</span>
                                     <span>{{ cat }}</span>
                                 </span>
                             </td>
@@ -77,17 +76,17 @@
                             <td>
                                 {% if item.status == "編輯中" %}
                                     <span class="badge status-draft">
-                                        <span class="icon icon-xs">{% include 'icons/status-draft.svg' %}</span>
+                                        <span class="icon icon-xs">{% include 'static/icons/status-draft.svg' %}</span>
                                         <span>{{ item.status }}</span>
                                     </span>
                                 {% elif item.status == "審查中" %}
                                     <span class="badge status-review">
-                                        <span class="icon icon-xs">{% include 'icons/status-review.svg' %}</span>
+                                        <span class="icon icon-xs">{% include 'static/icons/status-review.svg' %}</span>
                                         <span>{{ item.status }}</span>
                                     </span>
                                 {% elif item.status == "已通過" %}
                                     <span class="badge status-approved">
-                                        <span class="icon icon-xs">{% include 'icons/status-approved.svg' %}</span>
+                                        <span class="icon icon-xs">{% include 'static/icons/status-approved.svg' %}</span>
                                         <span>{{ item.status }}</span>
                                     </span>
                                 {% else %}
@@ -96,13 +95,11 @@
                             </td>
                             <td class="cell-time">
                                 <span class="time-item">
-                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
                                     <span>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</span>
                                 </span>
                             </td>
                             <td class="cell-time">
                                 <span class="time-item">
-                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
                                     <span>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</span>
                                 </span>
                             </td>
@@ -111,14 +108,14 @@
                                     <div class="action-group">
                                         <div class="action-row">
                                             <a class="btn btn-edit btn-sm" href="/author/{{ author_id }}/manuscripts/{{ item.id }}/edit">
-                                                <span class="icon icon-xs">{% include 'icons/edit.svg' %}</span>
+                                                <span class="icon icon-xs">{% include 'static/icons/edit.svg' %}</span>
                                                 <span>編輯內容</span>
                                             </a>
 
                                             <form class="inline-form" action="/author/{{ author_id }}/manuscripts/{{ item.id }}/submit" method="post">
                                                 <input type="hidden" name="author_id" value="{{ author_id }}">
                                                 <button class="btn btn-primary btn-sm" type="submit">
-                                                    <span class="icon icon-xs">{% include 'icons/send.svg' %}</span>
+                                                    <span class="icon icon-xs">{% include 'static/icons/send.svg' %}</span>
                                                     <span>送出審查</span>
                                                 </button>
                                             </form>
@@ -127,19 +124,19 @@
                                         <form class="inline-form" action="/author/{{ author_id }}/manuscripts/{{ item.id }}/delete" method="post">
                                             <input type="hidden" name="author_id" value="{{ author_id }}">
                                             <button class="btn btn-delete btn-sm" type="submit">
-                                                <span class="icon icon-xs">{% include 'icons/trash.svg' %}</span>
+                                                <span class="icon icon-xs">{% include 'static/icons/trash.svg' %}</span>
                                                 <span>刪除稿件</span>
                                             </button>
                                         </form>
                                     </div>
                                 {% elif item.status == "審查中" %}
                                     <span class="status-note">
-                                        <span class="icon icon-sm">{% include 'icons/lock.svg' %}</span>
+                                        <span class="icon icon-sm">{% include 'static/icons/lock.svg' %}</span>
                                         <span>審查中 (不可編輯與刪除)</span>
                                     </span>
                                 {% elif item.status == "已通過" %}
                                     <span class="status-note status-note-approved">
-                                        <span class="icon icon-sm">{% include 'icons/status-approved.svg' %}</span>
+                                        <span class="icon icon-sm">{% include 'static/icons/status-approved.svg' %}</span>
                                         <span>已通過審核</span>
                                     </span>
                                 {% else %}
@@ -154,11 +151,11 @@
             {% else %}
             <div class="empty-state">
                 <span class="empty-icon-wrap">
-                    <span class="icon icon-xl">{% include 'icons/empty.svg' %}</span>
+                    <span class="icon icon-xl">{% include 'static/icons/empty.svg' %}</span>
                 </span>
                 <p>目前尚無任何稿件紀錄。點擊下方按鈕即可開始撰寫您的第一篇稿件。</p>
                 <a class="btn btn-primary" href="/author/{{ author_id }}/manuscripts/new">
-                    <span class="icon icon-sm">{% include 'icons/plus.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/plus.svg' %}</span>
                     <span>新增稿件</span>
                 </a>
             </div>
@@ -168,7 +165,7 @@
         <section class="glass-card">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span class="icon icon-md">{% include 'static/icons/info.svg' %}</span>
                     <span>操作規則叮嚀</span>
                 </h3>
             </div>

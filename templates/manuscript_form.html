@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ "編輯稿件" if manuscript else "新增稿件" }} - 作者 ID: {{ author_id }}</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
     <div class="ambient-orb" aria-hidden="true"></div>
@@ -13,7 +13,7 @@
         <header class="glass-card topbar">
             <div class="brand-group">
                 <div class="brand-icon-wrap">
-                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                    <span class="icon icon-lg">{% include 'static/icons/logo.svg' %}</span>
                 </div>
                 <div>
                     <h1 class="page-title">{{ "編輯稿件內容" if manuscript else "建立新稿件" }}</h1>
@@ -23,11 +23,11 @@
 
             <nav class="nav-actions" aria-label="表單導覽">
                 <span class="role-pill">
-                    <span class="icon icon-sm">{% include 'icons/author.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/author.svg' %}</span>
                     <span>作者 {{ author_id }} (ID: {{ author_id }})</span>
                 </span>
                 <a class="btn btn-secondary" href="/author/{{ author_id }}/dashboard">
-                    <span class="icon icon-sm">{% include 'icons/arrow-left.svg' %}</span>
+                    <span class="icon icon-sm">{% include 'static/icons/arrow-left.svg' %}</span>
                     <span>返回作者儀表板</span>
                 </a>
             </nav>
@@ -43,7 +43,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="title">
-                            <span class="icon icon-sm">{% include 'icons/edit.svg' %}</span>
+                            <span class="icon icon-sm">{% include 'static/icons/edit.svg' %}</span>
                             <span>稿件標題</span>
                         </label>
                         <input class="form-control" type="text" id="title" name="title" maxlength="200" value="{{ manuscript.title if manuscript else '' }}" required placeholder="請輸入稿件標題">
@@ -51,7 +51,6 @@
 
                     <div class="form-group">
                         <label class="form-label" for="category">
-                            <span class="icon icon-sm">{% include 'icons/tag.svg' %}</span>
                             <span>稿件類別</span>
                         </label>
                         {% set resolved_default = default_category | default('--無類別--', true) %}
@@ -69,7 +68,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="content">
-                            <span class="icon icon-sm">{% include 'icons/status-draft.svg' %}</span>
+                            <span class="icon icon-sm">{% include 'static/icons/status-draft.svg' %}</span>
                             <span>稿件內文</span>
                         </label>
                         <textarea class="form-control" id="content" name="content" rows="12" required placeholder="請輸入稿件詳細內容...">{{ manuscript.content if manuscript else '' }}</textarea>
@@ -77,11 +76,11 @@
 
                     <div class="form-actions">
                         <button class="btn btn-primary" type="submit">
-                            <span class="icon icon-sm">{% include 'icons/save.svg' %}</span>
+                            <span class="icon icon-sm">{% include 'static/icons/save.svg' %}</span>
                             <span>{{ "儲存變更 (狀態保持為「編輯中」)" if manuscript else "確認新增 (建立為「編輯中」)" }}</span>
                         </button>
                         <a class="btn btn-secondary" href="/author/{{ author_id }}/dashboard">
-                            <span class="icon icon-sm">{% include 'icons/arrow-left.svg' %}</span>
+                            <span class="icon icon-sm">{% include 'static/icons/arrow-left.svg' %}</span>
                             <span>取消並返回</span>
                         </a>
                     </div>
@@ -92,7 +91,7 @@
         <section class="glass-card">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span class="icon icon-md">{% include 'static/icons/info.svg' %}</span>
                     <span>注意事項</span>
                 </h3>
             </div>

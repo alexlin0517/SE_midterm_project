@@ -6,6 +6,7 @@
 
 from contextlib import asynccontextmanager
 from typing import Optional
+import jinja2
 from fastapi import FastAPI, Depends, Request, Form, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -40,11 +41,22 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 掛載靜態資源目錄 (CSS 等靜態檔案)
+# 掛載靜態資源目錄 (CSS、背景圖片、SVG 圖示等靜態檔案)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# 設定 Jinja2 模板引擎
-templates = Jinja2Templates(directory="templates")
+# 設定 Jinja2 模板引擎 (同時支援 templates/ 與內嵌 static/icons/ 路徑)
+_jinja_env = jinja2.Environment(
+    loader=jinja2.ChoiceLoader([
+        jinja2.FileSystemLoader("templates"),
+        jinja2.PrefixLoader({
+            "static": jinja2.PrefixLoader({
+                "icons": jinja2.FileSystemLoader("static/icons"),
+            }),
+        }),
+    ]),
+    autoescape=jinja2.select_autoescape(),
+)
+templates = Jinja2Templates(env=_jinja_env)
 
 
 # ==============================================================================
