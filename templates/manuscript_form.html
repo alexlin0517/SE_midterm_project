@@ -2,66 +2,105 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ "編輯稿件" if manuscript else "新增稿件" }} - 作者 ID: {{ author_id }}</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>{{ "編輯稿件內容" if manuscript else "建立新稿件" }}</h1>
-    <p>作者編號：<strong>作者 {{ author_id }} (Author ID: {{ author_id }})</strong></p>
+    <div class="ambient-orb" aria-hidden="true"></div>
 
-    <nav>
-        <p><a href="/author/{{ author_id }}/dashboard">返回作者儀表板</a></p>
-    </nav>
+    <main class="app-shell app-shell-narrow stack-lg">
+        <header class="glass-card topbar">
+            <div class="brand-group">
+                <div class="brand-icon-wrap">
+                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                </div>
+                <div>
+                    <h1 class="page-title">{{ "編輯稿件內容" if manuscript else "建立新稿件" }}</h1>
+                    <p class="page-subtitle">填寫標題、選擇類別並撰寫稿件內文</p>
+                </div>
+            </div>
 
-    <hr>
+            <nav class="nav-actions" aria-label="表單導覽">
+                <span class="role-pill">
+                    <span class="icon icon-sm">{% include 'icons/author.svg' %}</span>
+                    <span>作者 {{ author_id }} (ID: {{ author_id }})</span>
+                </span>
+                <a class="btn btn-secondary" href="/author/{{ author_id }}/dashboard">
+                    <span class="icon icon-sm">{% include 'icons/arrow-left.svg' %}</span>
+                    <span>返回作者儀表板</span>
+                </a>
+            </nav>
+        </header>
 
-    <form action="{{ '/author/' ~ author_id ~ '/manuscripts/' ~ manuscript.id ~ '/edit' if manuscript else '/author/' ~ author_id ~ '/manuscripts/new' }}" method="post">
-        <!-- 模擬登入：透過隱藏欄位傳遞與驗證 author_id -->
-        <input type="hidden" name="author_id" value="{{ author_id }}">
+        <section class="glass-card">
+            <form action="{{ '/author/' ~ author_id ~ '/manuscripts/' ~ manuscript.id ~ '/edit' if manuscript else '/author/' ~ author_id ~ '/manuscripts/new' }}" method="post">
+                <!-- 模擬登入：透過隱藏欄位傳遞與驗證 author_id -->
+                <input type="hidden" name="author_id" value="{{ author_id }}">
 
-        <fieldset>
-            <legend>{{ "修改稿件資料" if manuscript else "撰寫稿件資訊" }}</legend>
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">{{ "修改稿件資料" if manuscript else "撰寫稿件資訊" }}</legend>
 
-            <p>
-                <label for="title"><strong>稿件標題：</strong></label>
-                <br>
-                <input type="text" id="title" name="title" size="60" maxlength="200" value="{{ manuscript.title if manuscript else '' }}" required placeholder="請輸入稿件標題">
-            </p>
+                    <div class="form-group">
+                        <label class="form-label" for="title">
+                            <span class="icon icon-sm">{% include 'icons/edit.svg' %}</span>
+                            <span>稿件標題</span>
+                        </label>
+                        <input class="form-control" type="text" id="title" name="title" maxlength="200" value="{{ manuscript.title if manuscript else '' }}" required placeholder="請輸入稿件標題">
+                    </div>
 
-            <p>
-                <label for="category"><strong>稿件類別：</strong></label>
-                <br>
-                {% set resolved_default = default_category | default('--無類別--', true) %}
-                {% set resolved_categories = categories | default(['散文', '小說', '心得', '紀錄', '評論', '其他'], true) %}
-                <select id="category" name="category">
-                    <option value="{{ resolved_default }}" {% if not manuscript or not manuscript.category or manuscript.category == resolved_default %}selected{% endif %}>{{ resolved_default }}</option>
-                    {% for cat in resolved_categories %}
-                    <option value="{{ cat }}" {% if manuscript and manuscript.category == cat %}selected{% endif %}>{{ cat }}</option>
-                    {% endfor %}
-                    {% if manuscript and manuscript.category and manuscript.category != resolved_default and manuscript.category not in resolved_categories %}
-                    <option value="{{ manuscript.category }}" selected>{{ manuscript.category }}</option>
-                    {% endif %}
-                </select>
-            </p>
+                    <div class="form-group">
+                        <label class="form-label" for="category">
+                            <span class="icon icon-sm">{% include 'icons/tag.svg' %}</span>
+                            <span>稿件類別</span>
+                        </label>
+                        {% set resolved_default = default_category | default('--無類別--', true) %}
+                        {% set resolved_categories = categories | default(['散文', '小說', '心得', '紀錄', '評論', '其他'], true) %}
+                        <select class="form-control" id="category" name="category">
+                            <option value="{{ resolved_default }}" {% if not manuscript or not manuscript.category or manuscript.category == resolved_default %}selected{% endif %}>{{ resolved_default }}</option>
+                            {% for cat in resolved_categories %}
+                            <option value="{{ cat }}" {% if manuscript and manuscript.category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                            {% if manuscript and manuscript.category and manuscript.category != resolved_default and manuscript.category not in resolved_categories %}
+                            <option value="{{ manuscript.category }}" selected>{{ manuscript.category }}</option>
+                            {% endif %}
+                        </select>
+                    </div>
 
-            <p>
-                <label for="content"><strong>稿件內文：</strong></label>
-                <br>
-                <textarea id="content" name="content" rows="12" cols="70" required placeholder="請輸入稿件詳細內容...">{{ manuscript.content if manuscript else '' }}</textarea>
-            </p>
+                    <div class="form-group">
+                        <label class="form-label" for="content">
+                            <span class="icon icon-sm">{% include 'icons/status-draft.svg' %}</span>
+                            <span>稿件內文</span>
+                        </label>
+                        <textarea class="form-control" id="content" name="content" rows="12" required placeholder="請輸入稿件詳細內容...">{{ manuscript.content if manuscript else '' }}</textarea>
+                    </div>
 
-            <p>
-                <button type="submit">{{ "儲存變更 (狀態保持為「編輯中」)" if manuscript else "確認新增 (建立為「編輯中」)" }}</button>
-                <a href="/author/{{ author_id }}/dashboard">取消並返回</a>
-            </p>
-        </fieldset>
-    </form>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">
+                            <span class="icon icon-sm">{% include 'icons/save.svg' %}</span>
+                            <span>{{ "儲存變更 (狀態保持為「編輯中」)" if manuscript else "確認新增 (建立為「編輯中」)" }}</span>
+                        </button>
+                        <a class="btn btn-secondary" href="/author/{{ author_id }}/dashboard">
+                            <span class="icon icon-sm">{% include 'icons/arrow-left.svg' %}</span>
+                            <span>取消並返回</span>
+                        </a>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
 
-    <hr>
-
-    <h3>注意事項</h3>
-    <ul>
-        <li>新增或修改後的稿件狀態皆會設為<strong>「編輯中」</strong>。</li>
-        <li>儲存後請至作者儀表板點選<strong>「送出審查」</strong>，稿件才會正式提交給編輯人員審核。</li>
-    </ul>
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span>注意事項</span>
+                </h3>
+            </div>
+            <ul class="rules-list">
+                <li>新增或修改後的稿件狀態皆會設為<strong>「編輯中」</strong>。</li>
+                <li>儲存後請至作者儀表板點選<strong>「送出審查」</strong>，稿件才會正式提交給編輯人員審核。</li>
+            </ul>
+        </section>
+    </main>
 </body>
 </html>

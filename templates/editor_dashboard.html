@@ -2,103 +2,218 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>編輯審查儀表板</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>編輯審查管理儀表板</h1>
-    <p>當前模擬身分：<strong>主編 / 審查編輯 (Editor)</strong></p>
+    <div class="ambient-orb" aria-hidden="true"></div>
 
-    <nav>
-        <p><a href="/">返回模擬登入首頁</a></p>
-    </nav>
+    <main class="app-shell stack-lg">
+        <header class="glass-card topbar">
+            <div class="brand-group">
+                <div class="brand-icon-wrap">
+                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                </div>
+                <div>
+                    <h1 class="page-title">編輯審查管理儀表板</h1>
+                    <p class="page-subtitle">審閱待審查稿件並執行通過或退回修訂決策</p>
+                </div>
+            </div>
 
-    <hr>
+            <nav class="nav-actions" aria-label="編輯功能導覽">
+                <span class="role-pill">
+                    <span class="icon icon-sm">{% include 'icons/editor.svg' %}</span>
+                    <span>主編 / 審查編輯 (Editor)</span>
+                </span>
+                <a class="btn btn-secondary" href="/">
+                    <span class="icon icon-sm">{% include 'icons/home.svg' %}</span>
+                    <span>返回模擬登入首頁</span>
+                </a>
+            </nav>
+        </header>
 
-    <h2>待審查稿件清單 (狀態：審查中)</h2>
+        <section class="glass-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/status-review.svg' %}</span>
+                    <span>待審查稿件清單 (狀態：審查中)</span>
+                </h2>
+                <span class="count-pill">待審 {{ under_review_manuscripts | length }} 筆</span>
+            </div>
 
-    {% if under_review_manuscripts %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>稿件編號</th>
-                <th>投稿作者</th>
-                <th>稿件標題</th>
-                <th>稿件類別</th>
-                <th>稿件完整內容</th>
-                <th>送審時間</th>
-                <th>審查決策</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in under_review_manuscripts %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td>作者 {{ item.author_id }} (Author ID: {{ item.author_id }})</td>
-                <td><strong>{{ item.title }}</strong></td>
-                <td>{{ item.category or "--無類別--" }}</td>
-                <td>{{ item.content }}</td>
-                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</td>
-                <td>
-                    <form action="/editor/manuscripts/{{ item.id }}/approve" method="post">
-                        <button type="submit">審核通過 (Approved)</button>
-                    </form>
+            {% if under_review_manuscripts %}
+            <div class="table-wrapper">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>稿件編號</th>
+                            <th>投稿作者</th>
+                            <th>稿件標題</th>
+                            <th>稿件類別</th>
+                            <th>稿件完整內容</th>
+                            <th>送審時間</th>
+                            <th>審查決策</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in under_review_manuscripts %}
+                        <tr>
+                            <td class="cell-id">#{{ item.id }}</td>
+                            <td>
+                                <span class="status-note">
+                                    <span class="icon icon-xs">{% include 'icons/author.svg' %}</span>
+                                    <span>作者 {{ item.author_id }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-title">{{ item.title }}</td>
+                            <td>
+                                {% set cat = item.category or "--無類別--" %}
+                                <span class="badge {% if cat == '--無類別--' %}category-empty{% else %}category-badge{% endif %}">
+                                    <span class="icon icon-xs">{% include 'icons/tag.svg' %}</span>
+                                    <span>{{ cat }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-content">{{ item.content }}</td>
+                            <td class="cell-time">
+                                <span class="time-item">
+                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
+                                    <span>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <form class="inline-form" action="/editor/manuscripts/{{ item.id }}/approve" method="post">
+                                        <button class="btn btn-approve btn-sm" type="submit">
+                                            <span class="icon icon-xs">{% include 'icons/approve.svg' %}</span>
+                                            <span>審核通過 (Approved)</span>
+                                        </button>
+                                    </form>
 
-                    <br>
+                                    <form class="inline-form" action="/editor/manuscripts/{{ item.id }}/reject" method="post">
+                                        <button class="btn btn-reject btn-sm" type="submit">
+                                            <span class="icon icon-xs">{% include 'icons/reject.svg' %}</span>
+                                            <span>退回修改 (Return to Draft)</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon-wrap">
+                    <span class="icon icon-xl">{% include 'icons/empty.svg' %}</span>
+                </span>
+                <p>目前沒有任何「審查中」的稿件待處理。</p>
+            </div>
+            {% endif %}
+        </section>
 
-                    <form action="/editor/manuscripts/{{ item.id }}/reject" method="post">
-                        <button type="submit">退回修改 (Return to Draft)</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>目前沒有任何「審查中」的稿件待處理。</p>
-    {% endif %}
+        <section class="glass-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/editor.svg' %}</span>
+                    <span>全系統稿件審查紀錄一覽</span>
+                </h2>
+                <span class="count-pill">共 {{ all_manuscripts | length }} 筆</span>
+            </div>
 
-    <hr>
+            {% if all_manuscripts %}
+            <div class="table-wrapper">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>稿件編號</th>
+                            <th>作者 ID</th>
+                            <th>稿件標題</th>
+                            <th>稿件類別</th>
+                            <th>目前狀態</th>
+                            <th>建立時間</th>
+                            <th>最後更新時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in all_manuscripts %}
+                        <tr>
+                            <td class="cell-id">#{{ item.id }}</td>
+                            <td>
+                                <span class="status-note">
+                                    <span class="icon icon-xs">{% include 'icons/author.svg' %}</span>
+                                    <span>作者 {{ item.author_id }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-title">{{ item.title }}</td>
+                            <td>
+                                {% set cat = item.category or "--無類別--" %}
+                                <span class="badge {% if cat == '--無類別--' %}category-empty{% else %}category-badge{% endif %}">
+                                    <span class="icon icon-xs">{% include 'icons/tag.svg' %}</span>
+                                    <span>{{ cat }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                {% if item.status == "編輯中" %}
+                                    <span class="badge status-draft">
+                                        <span class="icon icon-xs">{% include 'icons/status-draft.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% elif item.status == "審查中" %}
+                                    <span class="badge status-review">
+                                        <span class="icon icon-xs">{% include 'icons/status-review.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% elif item.status == "已通過" %}
+                                    <span class="badge status-approved">
+                                        <span class="icon icon-xs">{% include 'icons/status-approved.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% else %}
+                                    <span class="badge category-empty">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="cell-time">
+                                <span class="time-item">
+                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
+                                    <span>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-time">
+                                <span class="time-item">
+                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
+                                    <span>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</span>
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon-wrap">
+                    <span class="icon icon-xl">{% include 'icons/empty.svg' %}</span>
+                </span>
+                <p>資料庫中尚無任何稿件資料。</p>
+            </div>
+            {% endif %}
+        </section>
 
-    <h2>全系統稿件審查紀錄一覽</h2>
-
-    {% if all_manuscripts %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>稿件編號</th>
-                <th>作者 ID</th>
-                <th>稿件標題</th>
-                <th>稿件類別</th>
-                <th>目前狀態</th>
-                <th>建立時間</th>
-                <th>最後更新時間</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in all_manuscripts %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td>作者 {{ item.author_id }}</td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.category or "--無類別--" }}</td>
-                <td><strong>{{ item.status }}</strong></td>
-                <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</td>
-                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>資料庫中尚無任何稿件資料。</p>
-    {% endif %}
-
-    <hr>
-
-    <h3>審查規則說明</h3>
-    <ul>
-        <li>編輯僅能對狀態為<strong>「審查中」</strong>的稿件執行審核決策。</li>
-        <li>點擊<strong>「審核通過」</strong>：狀態改為「已通過」，稿件審查流程圓滿結束。</li>
-        <li>點擊<strong>「退回修改」</strong>：狀態退回為「編輯中」，該稿件將回歸作者儀表板供作者修改與重新送出。</li>
-    </ul>
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span>審查規則說明</span>
+                </h3>
+            </div>
+            <ul class="rules-list">
+                <li>編輯僅能對狀態為<strong>「審查中」</strong>的稿件執行審核決策。</li>
+                <li>點擊<strong>「審核通過」</strong>：狀態改為「已通過」，稿件審查流程圓滿結束。</li>
+                <li>點擊<strong>「退回修改」</strong>：狀態退回為「編輯中」，該稿件將回歸作者儀表板供作者修改與重新送出。</li>
+            </ul>
+        </section>
+    </main>
 </body>
 </html>

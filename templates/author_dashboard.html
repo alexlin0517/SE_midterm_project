@@ -2,85 +2,182 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>作者儀表板 - 作者 ID: {{ author_id }}</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>作者稿件管理儀表板</h1>
-    <p>當前模擬作者身分：<strong>作者 {{ author_id }} (Author ID: {{ author_id }})</strong></p>
+    <div class="ambient-orb" aria-hidden="true"></div>
 
-    <nav>
-        <p>
-            <a href="/">返回模擬登入首頁</a> |
-            <a href="/author/{{ author_id }}/manuscripts/new">新增稿件</a>
-        </p>
-    </nav>
+    <main class="app-shell stack-lg">
+        <header class="glass-card topbar">
+            <div class="brand-group">
+                <div class="brand-icon-wrap">
+                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                </div>
+                <div>
+                    <h1 class="page-title">作者稿件管理儀表板</h1>
+                    <p class="page-subtitle">管理個人投稿草稿、分類與送審狀態</p>
+                </div>
+            </div>
 
-    <hr>
+            <nav class="nav-actions" aria-label="作者功能導覽">
+                <span class="role-pill">
+                    <span class="icon icon-sm">{% include 'icons/author.svg' %}</span>
+                    <span>作者 {{ author_id }} (ID: {{ author_id }})</span>
+                </span>
+                <a class="btn btn-secondary" href="/">
+                    <span class="icon icon-sm">{% include 'icons/home.svg' %}</span>
+                    <span>返回模擬登入首頁</span>
+                </a>
+                <a class="btn btn-primary" href="/author/{{ author_id }}/manuscripts/new">
+                    <span class="icon icon-sm">{% include 'icons/plus.svg' %}</span>
+                    <span>新增稿件</span>
+                </a>
+            </nav>
+        </header>
 
-    <h2>我的稿件列表</h2>
+        <section class="glass-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/status-draft.svg' %}</span>
+                    <span>我的稿件列表</span>
+                </h2>
+                <span class="count-pill">共 {{ manuscripts | length }} 筆</span>
+            </div>
 
-    {% if manuscripts %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>稿件編號</th>
-                <th>稿件標題</th>
-                <th>稿件類別</th>
-                <th>稿件內容</th>
-                <th>目前狀態</th>
-                <th>建立時間</th>
-                <th>最後更新時間</th>
-                <th>可用操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in manuscripts %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td><strong>{{ item.title }}</strong></td>
-                <td>{{ item.category or "--無類別--" }}</td>
-                <td>{{ item.content }}</td>
-                <td>
-                    <strong>{{ item.status }}</strong>
-                </td>
-                <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</td>
-                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</td>
-                <td>
-                    {% if item.status == "編輯中" %}
-                        <p><a href="/author/{{ author_id }}/manuscripts/{{ item.id }}/edit">編輯內容</a></p>
-                        
-                        <form action="/author/{{ author_id }}/manuscripts/{{ item.id }}/submit" method="post">
-                            <input type="hidden" name="author_id" value="{{ author_id }}">
-                            <button type="submit">送出審查</button>
-                        </form>
+            {% if manuscripts %}
+            <div class="table-wrapper">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>稿件編號</th>
+                            <th>稿件標題</th>
+                            <th>稿件類別</th>
+                            <th>稿件內容</th>
+                            <th>目前狀態</th>
+                            <th>建立時間</th>
+                            <th>最後更新時間</th>
+                            <th>可用操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in manuscripts %}
+                        <tr>
+                            <td class="cell-id">#{{ item.id }}</td>
+                            <td class="cell-title">{{ item.title }}</td>
+                            <td>
+                                {% set cat = item.category or "--無類別--" %}
+                                <span class="badge {% if cat == '--無類別--' %}category-empty{% else %}category-badge{% endif %}">
+                                    <span class="icon icon-xs">{% include 'icons/tag.svg' %}</span>
+                                    <span>{{ cat }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-content">{{ item.content }}</td>
+                            <td>
+                                {% if item.status == "編輯中" %}
+                                    <span class="badge status-draft">
+                                        <span class="icon icon-xs">{% include 'icons/status-draft.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% elif item.status == "審查中" %}
+                                    <span class="badge status-review">
+                                        <span class="icon icon-xs">{% include 'icons/status-review.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% elif item.status == "已通過" %}
+                                    <span class="badge status-approved">
+                                        <span class="icon icon-xs">{% include 'icons/status-approved.svg' %}</span>
+                                        <span>{{ item.status }}</span>
+                                    </span>
+                                {% else %}
+                                    <span class="badge category-empty">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="cell-time">
+                                <span class="time-item">
+                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
+                                    <span>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') if item.created_at else '' }}</span>
+                                </span>
+                            </td>
+                            <td class="cell-time">
+                                <span class="time-item">
+                                    <span class="icon icon-xs">{% include 'icons/clock.svg' %}</span>
+                                    <span>{{ item.updated_at.strftime('%Y-%m-%d %H:%M:%S') if item.updated_at else '' }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                {% if item.status == "編輯中" %}
+                                    <div class="action-group">
+                                        <div class="action-row">
+                                            <a class="btn btn-edit btn-sm" href="/author/{{ author_id }}/manuscripts/{{ item.id }}/edit">
+                                                <span class="icon icon-xs">{% include 'icons/edit.svg' %}</span>
+                                                <span>編輯內容</span>
+                                            </a>
 
-                        <form action="/author/{{ author_id }}/manuscripts/{{ item.id }}/delete" method="post">
-                            <input type="hidden" name="author_id" value="{{ author_id }}">
-                            <button type="submit">刪除稿件</button>
-                        </form>
-                    {% elif item.status == "審查中" %}
-                        <em>審查中 (不可編輯與刪除)</em>
-                    {% elif item.status == "已通過" %}
-                        <strong>已通過審核</strong>
-                    {% else %}
-                        <em>{{ item.status }}</em>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>目前尚無任何稿件紀錄。請點擊上方「<a href="/author/{{ author_id }}/manuscripts/new">新增稿件</a>」開始撰寫您的第一篇稿件！</p>
-    {% endif %}
+                                            <form class="inline-form" action="/author/{{ author_id }}/manuscripts/{{ item.id }}/submit" method="post">
+                                                <input type="hidden" name="author_id" value="{{ author_id }}">
+                                                <button class="btn btn-primary btn-sm" type="submit">
+                                                    <span class="icon icon-xs">{% include 'icons/send.svg' %}</span>
+                                                    <span>送出審查</span>
+                                                </button>
+                                            </form>
+                                        </div>
 
-    <hr>
+                                        <form class="inline-form" action="/author/{{ author_id }}/manuscripts/{{ item.id }}/delete" method="post">
+                                            <input type="hidden" name="author_id" value="{{ author_id }}">
+                                            <button class="btn btn-delete btn-sm" type="submit">
+                                                <span class="icon icon-xs">{% include 'icons/trash.svg' %}</span>
+                                                <span>刪除稿件</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% elif item.status == "審查中" %}
+                                    <span class="status-note">
+                                        <span class="icon icon-sm">{% include 'icons/lock.svg' %}</span>
+                                        <span>審查中 (不可編輯與刪除)</span>
+                                    </span>
+                                {% elif item.status == "已通過" %}
+                                    <span class="status-note status-note-approved">
+                                        <span class="icon icon-sm">{% include 'icons/status-approved.svg' %}</span>
+                                        <span>已通過審核</span>
+                                    </span>
+                                {% else %}
+                                    <span class="status-note">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon-wrap">
+                    <span class="icon icon-xl">{% include 'icons/empty.svg' %}</span>
+                </span>
+                <p>目前尚無任何稿件紀錄。點擊下方按鈕即可開始撰寫您的第一篇稿件。</p>
+                <a class="btn btn-primary" href="/author/{{ author_id }}/manuscripts/new">
+                    <span class="icon icon-sm">{% include 'icons/plus.svg' %}</span>
+                    <span>新增稿件</span>
+                </a>
+            </div>
+            {% endif %}
+        </section>
 
-    <h3>操作規則叮嚀</h3>
-    <ul>
-        <li>狀態為<strong>「編輯中」</strong>時，您可以自由修改內容、送出審查或刪除稿件。</li>
-        <li>一旦點選<strong>「送出審查」</strong>，稿件狀態將變更為「審查中」，並呈現在編輯儀表板中，此時無法再編輯或刪除。</li>
-        <li>若編輯審查後退回，狀態將重新回到<strong>「編輯中」</strong>，您即可再次進行修訂。</li>
-    </ul>
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span>操作規則叮嚀</span>
+                </h3>
+            </div>
+            <ul class="rules-list">
+                <li>狀態為<strong>「編輯中」</strong>時，您可以自由修改內容、送出審查或刪除稿件。</li>
+                <li>一旦點選<strong>「送出審查」</strong>，稿件狀態將變更為「審查中」，並呈現在編輯儀表板中，此時無法再編輯或刪除。</li>
+                <li>若編輯審查後退回，狀態將重新回到<strong>「編輯中」</strong>，您即可再次進行修訂。</li>
+            </ul>
+        </section>
+    </main>
 </body>
 </html>

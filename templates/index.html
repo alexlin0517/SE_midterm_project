@@ -2,43 +2,119 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>投稿審查系統 - 模擬登入首頁</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>投稿審查系統 (Submission and Review System)</h1>
-    <p>歡迎使用投稿審查系統！本系統採用單體式架構 (Monolithic Architecture) 與伺服器端渲染 (SSR)。</p>
-    <p>本專案採用「模擬登入 (Mock Login)」機制切換角色，請選擇您的模擬身分進入系統：</p>
+    <div class="ambient-orb" aria-hidden="true"></div>
 
-    <hr>
+    <main class="app-shell stack-lg">
+        <header class="glass-card hero-card">
+            <div class="brand-group">
+                <div class="brand-icon-wrap">
+                    <span class="icon icon-lg">{% include 'icons/logo.svg' %}</span>
+                </div>
+                <div>
+                    <h1 class="hero-title">投稿審查系統</h1>
+                    <p class="page-subtitle">Submission and Review System · 單體式架構與伺服器端渲染 (SSR)</p>
+                </div>
+            </div>
+            <p class="page-subtitle">本專案採用「模擬登入 (Mock Login)」機制切換角色，請選擇您的模擬身分進入系統。</p>
+        </header>
 
-    <h2>請選擇身分進入儀表板</h2>
-    <ul>
-        <li>
-            <strong>作者身分 (Author)：</strong>
-            <ul>
-                <li><a href="/author/1/dashboard">以「作者 1 (Author ID: 1)」身分登入</a></li>
-                <li><a href="/author/2/dashboard">以「作者 2 (Author ID: 2)」身分登入</a></li>
-                <li><a href="/author/3/dashboard">以「作者 3 (Author ID: 3)」身分登入</a></li>
-            </ul>
-        </li>
-        <li>
-            <strong>編輯身分 (Editor)：</strong>
-            <ul>
-                <li><a href="/editor/dashboard">以「編輯 (Editor)」身分進入審查後台</a></li>
-            </ul>
-        </li>
-    </ul>
+        <section class="role-grid" aria-label="模擬身分選擇">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="icon icon-md">{% include 'icons/author.svg' %}</span>
+                        <span>作者身分 (Author)</span>
+                    </h2>
+                    <span class="count-pill">3 組測試身分</span>
+                </div>
+                <div class="role-list">
+                    <a class="role-link-card" href="/author/1/dashboard">
+                        <div class="role-link-left">
+                            <span class="role-icon-box">
+                                <span class="icon icon-md">{% include 'icons/author.svg' %}</span>
+                            </span>
+                            <div>
+                                <span class="role-link-title">作者 1 (Author ID: 1)</span>
+                                <span class="role-link-meta">撰寫、管理個人稿件與送出審查</span>
+                            </div>
+                        </div>
+                        <span class="role-enter-hint">進入儀表板</span>
+                    </a>
 
-    <hr>
+                    <a class="role-link-card" href="/author/2/dashboard">
+                        <div class="role-link-left">
+                            <span class="role-icon-box">
+                                <span class="icon icon-md">{% include 'icons/author.svg' %}</span>
+                            </span>
+                            <div>
+                                <span class="role-link-title">作者 2 (Author ID: 2)</span>
+                                <span class="role-link-meta">撰寫、管理個人稿件與送出審查</span>
+                            </div>
+                        </div>
+                        <span class="role-enter-hint">進入儀表板</span>
+                    </a>
 
-    <h2>系統核心規則與狀態流轉說明</h2>
-    <ol>
-        <li><strong>稿件狀態定義：</strong>編輯中 (Draft)、審查中 (Under Review)、已通過 (Approved)。</li>
-        <li><strong>[作者] 新增/編輯稿件：</strong>稿件初始狀態或修改後狀態均為「編輯中」。</li>
-        <li><strong>[作者] 刪除稿件：</strong>只有狀態為「編輯中」的稿件可以被刪除。</li>
-        <li><strong>[作者] 送出投稿：</strong>狀態將由「編輯中」推進為「審查中」，進入編輯待審清單，作者端鎖定修改與刪除。</li>
-        <li><strong>[編輯] 審核通過：</strong>狀態由「審查中」推進為「已通過」。</li>
-        <li><strong>[編輯] 退回稿件：</strong>狀態由「審查中」退回為「編輯中」，作者可重新修改後再次投稿。</li>
-    </ol>
+                    <a class="role-link-card" href="/author/3/dashboard">
+                        <div class="role-link-left">
+                            <span class="role-icon-box">
+                                <span class="icon icon-md">{% include 'icons/author.svg' %}</span>
+                            </span>
+                            <div>
+                                <span class="role-link-title">作者 3 (Author ID: 3)</span>
+                                <span class="role-link-meta">撰寫、管理個人稿件與送出審查</span>
+                            </div>
+                        </div>
+                        <span class="role-enter-hint">進入儀表板</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="icon icon-md">{% include 'icons/editor.svg' %}</span>
+                        <span>編輯身分 (Editor)</span>
+                    </h2>
+                    <span class="count-pill">審查權限</span>
+                </div>
+                <div class="role-list">
+                    <a class="role-link-card role-link-card-editor" href="/editor/dashboard">
+                        <div class="role-link-left">
+                            <span class="role-icon-box">
+                                <span class="icon icon-md">{% include 'icons/editor.svg' %}</span>
+                            </span>
+                            <div>
+                                <span class="role-link-title">編輯審查後台 (Editor)</span>
+                                <span class="role-link-meta">審核「審查中」稿件、執行通過或退回修訂</span>
+                            </div>
+                        </div>
+                        <span class="role-enter-hint">進入後台</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon icon-md">{% include 'icons/info.svg' %}</span>
+                    <span>系統核心規則與狀態流轉說明</span>
+                </h2>
+            </div>
+            <ol class="rules-list">
+                <li><strong>稿件狀態定義：</strong>編輯中 (Draft)、審查中 (Under Review)、已通過 (Approved)。</li>
+                <li><strong>[作者] 新增/編輯稿件：</strong>稿件初始狀態或修改後狀態均為「編輯中」。</li>
+                <li><strong>[作者] 刪除稿件：</strong>只有狀態為「編輯中」的稿件可以被刪除。</li>
+                <li><strong>[作者] 送出投稿：</strong>狀態將由「編輯中」推進為「審查中」，進入編輯待審清單，作者端鎖定修改與刪除。</li>
+                <li><strong>[編輯] 審核通過：</strong>狀態由「審查中」推進為「已通過」。</li>
+                <li><strong>[編輯] 退回稿件：</strong>狀態由「審查中」退回為「編輯中」，作者可重新修改後再次投稿。</li>
+            </ol>
+        </section>
+    </main>
 </body>
 </html>

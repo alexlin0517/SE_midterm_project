@@ -2,20 +2,34 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>操作錯誤 - HTTP {{ status_code }}</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>系統操作提示與錯誤</h1>
-    <p>HTTP 狀態碼：<strong>{{ status_code }}</strong></p>
-    <p>錯誤訊息說明：<strong>{{ detail }}</strong></p>
+    <div class="ambient-orb" aria-hidden="true"></div>
 
-    <hr>
+    <main class="app-shell">
+        <section class="glass-card error-card">
+            <div class="error-icon-wrap">
+                <span class="icon icon-xl">{% include 'icons/alert.svg' %}</span>
+            </div>
 
-    <nav>
-        <p>
-            <a href="javascript:history.back()">回上一頁</a> |
-            <a href="/">返回模擬登入首頁</a>
-        </p>
-    </nav>
+            <span class="error-code-badge">HTTP {{ status_code }}</span>
+            <h1 class="page-title">系統操作提示與錯誤</h1>
+            <p class="error-detail">{{ detail }}</p>
+
+            <nav class="error-actions" aria-label="錯誤頁面導覽">
+                <a class="btn btn-secondary" href="javascript:history.back()">
+                    <span class="icon icon-sm">{% include 'icons/arrow-left.svg' %}</span>
+                    <span>回上一頁</span>
+                </a>
+                <a class="btn btn-primary" href="/">
+                    <span class="icon icon-sm">{% include 'icons/home.svg' %}</span>
+                    <span>返回模擬登入首頁</span>
+                </a>
+            </nav>
+        </section>
+    </main>
 </body>
 </html>

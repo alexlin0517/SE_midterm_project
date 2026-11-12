@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from typing import Optional
 from fastapi import FastAPI, Depends, Request, Form, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
@@ -38,6 +39,9 @@ app = FastAPI(
     description="基於 FastAPI + SQLAlchemy + PostgreSQL + Jinja2 的單體式伺服器端渲染 (SSR) 投稿審查系統",
     lifespan=lifespan
 )
+
+# 掛載靜態資源目錄 (CSS 等靜態檔案)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 設定 Jinja2 模板引擎
 templates = Jinja2Templates(directory="templates")
